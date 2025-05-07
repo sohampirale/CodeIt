@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Code Input</title>
+  <link rel="stylesheet" href="/styles/onlineCompilor.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+</head>
+<body>
+  <div class="page-container">
+    <button id="toggle-sidebar-btn">☰</button>
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <p class="greet-user"></p>
+        <h2>Your Code History</h2>
+      </div>
+      <div class="history-list" id="history-list">
+
+      </div>
+    </div>
+
+    <div class="main-container">
+      <div class="code-input-container">
+        <h1>Write Your Code</h1>
+        <textarea id="js-code-area" placeholder="Write your code here..." rows="15"></textarea>
+        <button id="js-run-code-btn">Run Code</button>
+        <div>
+          <label for="language-select">Select Language:</label>
+          <select id="language-select">
+            <option value="Python">Python</option>
+          </select>
+
+        </div>
+      </div>
+
+      <div class="code-output-container">
+        <h1>Output of Your Code</h1>
+        <textarea id="js-output-area" placeholder="Your output will appear here..." rows="15" readonly></textarea>
+      </div>
+    <button id="logout-btn">Logout</button>
+    </div>
+
+  </div>
+
+  <script src="/scripts/onlineCompilor.js"></script>
+
+</body>
+</html>
+
+<!-- <option value="python">Python</option> -->

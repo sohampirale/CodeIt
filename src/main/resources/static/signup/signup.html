@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="../styles/signup.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+</head>
+<body>
+
+  <div class="background-circles">
+    <div class="circle"></div>
+    <div class="circle"></div>
+  </div>
+
+  <div class="signup-container">
+    <h2>Create Your Account</h2>
+    <form id="signup-form">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <input type="password" id="confirm-password" placeholder="Confirm Password" required />
+      <button type="submit" id="signup-btn">Sign Up</button>
+    </form>
+    <div class="link">
+      Already have an account? <button id="login-btn">Login</button>
+    </div>
+  </div>
+  <script src="../scripts/signup.js"></script>
+</body>
+</html>

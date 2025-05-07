@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+    <link rel="stylesheet" href="../styles/login.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+</head>
+<body>
+
+  <div class="background-circles">
+    <div class="circle"></div>
+    <div class="circle"></div>
+  </div>
+
+  <div class="login-container">
+    <h2>Login to Your Account</h2>
+    <form id="login-form">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit" id="login-btn">Login</button>
+    </form>
+    <div >
+      Don't have an account? <button class="signup-btn">Sign up</button>
+    </div>
+  </div>
+  <script src="../scripts/login.js"></script>
+</body>
+</html>
