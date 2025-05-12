@@ -1,24 +1,26 @@
 package com.codeit.dto;
 
 public class UserCodeDTO {
-    private int id;
+    private String id;
     private String code;
     private String output;
     private String language;
 
     public UserCodeDTO() {}
 
-    public UserCodeDTO(int id, String code, String output, String language) {
-        this.id = id;
-        this.code = code;
-        this.output = output;
+    public UserCodeDTO(String id, String code, String output, String language) {
+        this.id       = id;
+        this.code     = code;
+        this.output   = output;
         this.language = language;
     }
 
-    public int getId() {
+    // ───── Getters & Setters ───────────────────────────────────────────────────
+
+    public String getId() {
         return id;
     }
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

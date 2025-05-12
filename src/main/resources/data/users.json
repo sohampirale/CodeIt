@@ -8,10 +8,5 @@
     "username": "user1",
     "password": "password1",
     "unsuccessfulAttempts": 0.0
-  },
-  {
-    "username": "soham",
-    "password": "pw@1",
-    "unsuccessfulAttempts": 0
   }
 ]

@@ -7,13 +7,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-/**
- * Service for generating and validating JWT tokens.
- */
 @Service
 public class JwtService {
 
-    private final String JWT_SECRET = "your-jwt-secret-key";
+    private final String JWT_SECRET = "WmZ4ak1WcE1ObmV3eGZQaHdZbkxzWjFlYlJ3Y0N5SzI";
     private final long JWT_EXPIRATION = 24 * 60 * 60 * 1000L; // 1 day in milliseconds
 
     /**

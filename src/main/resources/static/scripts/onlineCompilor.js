@@ -46,35 +46,46 @@ function reloadPreviousCode(){
 }
 
 async function getDataFromBackend() {
-    const response = await api.get('/api/code/history', {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${loginCredentials.token}` // Assuming loginCredentials has a token field
-        },
+    try {
+        alert('sending get request nto /api/code/history');
+      const response = await api.get('/api/code/history', {
         withCredentials: true
-    });
-
-    const getDataResponse = await response.data;
-    if (getDataResponse.status != 200) {
-        historyListElem.innerHTML = `<div class="history-item">Let's make the first compilation!:)</div>`;
-    } else {
-        const history = getDataResponse.history;
-        history.forEach((work) => {
-            const workElem = document.createElement('div');
-            workElem.classList.add('H' + work.id);
-            workElem.classList.add('history-item');
-            workElem.innerHTML = work.code;
-            workElem.addEventListener('click', () => {
-                if (temoCodeStore == '') temoCodeStore = codeAreaElem.value;
-                codeAreaElem.value = work.code;
-                outputAreaElem.value = work.output;
-            });
-            historyListElem.appendChild(workElem);
+      });
+  
+      // response.data is always an array now
+      const history = response.data;
+      console.log('History = '+JSON.stringify(history));
+      
+      historyListElem.innerHTML = ''; // clear old items
+  
+      if (history.length === 0) {
+        historyListElem.innerHTML = `<div class="history-item">Let's make the first compilation! :)</div>`;
+        return;
+      }
+  
+      history.forEach(work => {
+        const workElem = document.createElement('div');
+        workElem.classList.add('H' + work.id, 'history-item');
+        workElem.textContent = work.code;
+        workElem.addEventListener('click', () => {
+          if (!temoCodeStore) temoCodeStore = codeAreaElem.value;
+          codeAreaElem.value = work.code;
+          outputAreaElem.value = work.output;
         });
+        historyListElem.appendChild(workElem);
+      });
+  
+      console.log('Data received:', history);
+  
+    } catch (error) {
+      console.error("Error fetching history:", error);
+      historyListElem.innerHTML = `<div class="history-item">Error fetching history 😢</div>`;
     }
-    console.log('Data received:', JSON.stringify(getDataResponse));
-}
+  }
+  
 
+
+getDataFromBackend();
 
 if(!loginCredentials){
     alert('You need to login first to access this page');
@@ -82,7 +93,7 @@ if(!loginCredentials){
 } else {
     console.log('Welcome : '+loginCredentials.username);
     greetUserElem.innerHTML=`Welcome ${loginCredentials.username}`
-    getDataFromBackend();
+    // getDataFromBackend();
 }
 
 codeAreaElem.addEventListener('keydown',async (event)=>{

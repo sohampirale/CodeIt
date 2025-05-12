@@ -48,47 +48,62 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @RequestBody LoginRequest request,
-            HttpServletResponse response    // ← add this parameter
-    ) {
-        System.out.println("inside /login");
-    
-        // 1️⃣ Lookup user in MongoDB instead of reading users.json
-        Optional<User> optUser = userRepository.findByUsername(request.getUsername());
-        if (optUser.isEmpty()) {
-            return ResponseEntity
-                .status(404)
-                .body(new LoginResponse(404, "Username not found", null));
-        }
-    
-        User user = optUser.get();
-        if (!user.getPassword().equals(request.getPassword())) {
-            // handle failed attempts as before...
-            return ResponseEntity
-                .status(401)
-                .body(new LoginResponse(401, "Incorrect password", null));
-        }
-    
-        // 2️⃣ Generate a real JWT
-        String token = jwtService.generateToken(request.getUsername());
-    
-        // 3️⃣ Set the token cookie on the HttpServletResponse
-        ResponseCookie cookie = ResponseCookie.from("token", token)
-            .httpOnly(true)
-            .secure(true)          // true if you’re using HTTPS
-            .sameSite("None")      // or "Lax" depending on your needs
-            .path("/")
-            .maxAge(24 * 60 * 60)  // 1 day
-            .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-    
-        // 4️⃣ Return the token in the JSON body as well
-        return ResponseEntity.ok(
-            new LoginResponse(200, "Login successful", token)
-        );
+        @RequestBody LoginRequest request,
+        HttpServletResponse response
+) {
+    System.out.println("inside /login");
+
+    // 1️⃣ Lookup user in MongoDB
+    Optional<User> optUser = userRepository.findByUsername(request.getUsername());
+    if (optUser.isEmpty()) {
+        return ResponseEntity
+            .status(404)
+            .body(new LoginResponse(404, "Username not found", null));
     }
-    
-    // Helper function to read JSON file
+
+    User user = optUser.get();
+    System.out.println("Input password: '" + request.getPassword() + "'");
+    System.out.println("Stored password: '" + user.getPassword() + "'");
+
+    // 2️⃣ Check for too many failed attempts
+    if (user.getUnsuccessfulAttempts() >= 3) {
+        return ResponseEntity
+            .status(423)  // 423 Locked
+            .body(new LoginResponse(423, "Account locked due to too many failed attempts", null));
+    }
+
+    // 3️⃣ Verify password
+    if (!user.getPassword().equals(request.getPassword())) {
+        // increment and save failed attempts
+        user.setUnsuccessfulAttempts(user.getUnsuccessfulAttempts() + 1);
+        userRepository.save(user);
+
+        return ResponseEntity
+            .status(401)
+            .body(new LoginResponse(401, "Incorrect password", null));
+    }
+
+    // 4️⃣ On success, reset attempts and save
+    user.setUnsuccessfulAttempts(0);
+    userRepository.save(user);
+
+    // 5️⃣ Generate JWT
+    String token = jwtService.generateToken(user.getUsername());
+
+    // 6️⃣ Set the JWT in an HttpOnly cookie
+    ResponseCookie cookie = ResponseCookie.from("token", token)
+        .httpOnly(true)
+        .secure(true)
+        .sameSite("None")
+        .path("/")
+        .maxAge(24 * 60 * 60)  // 1 day
+        .build();
+    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+    // 7️⃣ Return success
+    return ResponseEntity.ok(new LoginResponse(200, "Login successful", token));
+}
+
     private List<Map<String, Object>> readJsonFile(String filePath) {
         try {
             File file = ResourceUtils.getFile(filePath);
@@ -101,7 +116,6 @@ public class AuthController {
         }
     }
 
-    // Helper function to write to JSON file
     private void writeJsonFile(String filePath, List<Map<String, Object>> data) {
         try {
             FileWriter writer = new FileWriter(ResourceUtils.getFile(filePath));
@@ -113,19 +127,25 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
-        System.out.println("inside / logout");
-    ResponseCookie cookie = ResponseCookie.from("token", "")
-            .httpOnly(true)
-            .secure(true)
-            .sameSite("None")
-            .path("/")
-            .maxAge(0) // Immediately expires
-            .build();
-        System.out.println("test1");
-    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-    System.out.println("test2");
-    return ResponseEntity.ok().body("Logged out successfully.");
+    public ResponseEntity<Map<String, Object>> logout(HttpServletResponse response) {
+    // 1️⃣ Build an expired “token” cookie on the same path & security settings
+    ResponseCookie deleteCookie = ResponseCookie.from("token", "")
+        .httpOnly(true)
+        .secure(true)
+        .sameSite("None")
+        .path("/")
+        .maxAge(0)   // Immediately expire
+        .build();
+
+    // 2️⃣ Add it to the response header
+    response.setHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
+
+    // 3️⃣ Return a JSON map with status + message
+    Map<String, Object> body = new HashMap<>();
+    body.put("status", 200);
+    body.put("message", "Logged out successfully");
+
+    return ResponseEntity.ok(body);
 }
 
     @PostMapping("/signup")
@@ -173,6 +193,5 @@ public class AuthController {
             "token", token
         ));
     }
-
 
 }

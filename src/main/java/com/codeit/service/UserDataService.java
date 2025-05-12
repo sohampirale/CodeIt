@@ -84,8 +84,10 @@ public class UserDataService {
                 String code = (String) e.get("code");
                 String output = (String) e.get("output");
                 String lang = (String) e.get("language");
-                dtos.add(new UserCodeDTO(id, code, output, lang));
+                
+                dtos.add(new UserCodeDTO(String.valueOf(id), code, output, lang));
             }
+            
             return dtos;
         } catch (IOException e) {
             e.printStackTrace();
